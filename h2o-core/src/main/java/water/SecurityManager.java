@@ -45,7 +45,7 @@ public class SecurityManager {
     public boolean securityEnabled = false;
     private SSLSocketChannelFactory sslSocketChannelFactory;
 
-    public SecurityManager() {
+    SecurityManager() {
         try {
             if (H2O.ARGS.h2o_ssl_enabled) {
                 this.sslSocketChannelFactory = new SSLSocketChannelFactory();
@@ -53,9 +53,9 @@ public class SecurityManager {
             }
         } catch (SSLContextException e) {
             Log.err("Node initialized with SSL enabled but failed to create SSLContext. " +
-                    "Node will run in nonSSL mode.", e);
-            // Should we instead fail the node init?
-            H2O.ARGS.h2o_ssl_enabled = false;
+                    "Node initialization aborted.");
+            Log.err(e);
+            H2O.exit(1);
         }
     }
 
