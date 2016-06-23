@@ -17,12 +17,23 @@ public class SSLSocketChannelFactory {
 
     public SSLSocketChannelFactory() throws SSLContextException {
         try {
-            this.sslContext = SSLContext.getInstance(H2O.ARGS.h2o_ssl_protocol);
-            this.sslContext.init(keyManager(), trustManager(), null);
+            if(sslParamsPresent()) {
+                this.sslContext = SSLContext.getInstance(H2O.ARGS.h2o_ssl_protocol);
+                this.sslContext.init(keyManager(), trustManager(), null);
+            } else {
+                this.sslContext = SSLContext.getDefault();
+            }
         } catch (NoSuchAlgorithmException | IOException | UnrecoverableKeyException | KeyStoreException | KeyManagementException | CertificateException e) {
             Log.err("Failed to initialized SSL context.", e);
             throw new SSLContextException("Failed to initialized SSL context.", e);
         }
+    }
+
+    private boolean sslParamsPresent() {
+        return null != H2O.ARGS.h2o_ssl_jks_internal &&
+        null != H2O.ARGS.h2o_ssl_jks_password &&
+        null != H2O.ARGS.h2o_ssl_jts &&
+        null != H2O.ARGS.h2o_ssl_jts_password;
     }
 
     private TrustManager[] trustManager() throws

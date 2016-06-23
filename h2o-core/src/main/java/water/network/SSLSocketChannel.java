@@ -16,7 +16,7 @@ import java.nio.channels.SocketChannel;
  * It's a simple wrapper around SocketChannels which enables SSL/TLS
  * communication using {@link javax.net.ssl.SSLEngine}.
  */
-public class SSLSocketChannel implements ByteChannel {
+class SSLSocketChannel implements ByteChannel {
 
     // Buffers holding encrypted data
     private ByteBuffer netInBuffer;
@@ -33,7 +33,7 @@ public class SSLSocketChannel implements ByteChannel {
     private boolean closing = false;
     private boolean closed = false;
 
-    public SSLSocketChannel(SocketChannel channel, SSLEngine sslEngine) throws IOException {
+    SSLSocketChannel(SocketChannel channel, SSLEngine sslEngine) throws IOException {
         this.channel = channel;
         this.sslEngine = sslEngine;
 
@@ -86,7 +86,7 @@ public class SSLSocketChannel implements ByteChannel {
     // HANDSHAKE
     // -----------------------------------------------------------
 
-    SSLEngineResult.HandshakeStatus hs;
+    private SSLEngineResult.HandshakeStatus hs;
 
     private void handshake() throws IOException {
         sslEngine.beginHandshake();
@@ -196,6 +196,7 @@ public class SSLSocketChannel implements ByteChannel {
             }
         } while(
                 unwrapResult.getStatus() == SSLEngineResult.Status.OK &&
+                // The first condition is mainly for handshakes, sslengine#unwrap does not consume the buffer during handshakes
                 (remaining != netInBuffer.remaining() || sslEngine.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)
                 );
 
