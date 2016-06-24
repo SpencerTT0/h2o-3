@@ -48,7 +48,7 @@ public class GBM_Example {
             System.out.println("import: " + importBody);
 
             // STEP 2: parse setup
-            ParseSetupV3 parseSetupBody = h2o.guessParseSetup(H2oApi.stringArrayToFrameKeyArray(importBody.destinationFrames));
+            ParseSetupV3 parseSetupBody = h2o.guessParseSetup(H2oApi.stringArrayToKeyArray(importBody.destinationFrames, FrameKeyV3.class));
             System.out.println("parseSetupBody: " + parseSetupBody);
 
             // STEP 3: parse into columnar Frame
