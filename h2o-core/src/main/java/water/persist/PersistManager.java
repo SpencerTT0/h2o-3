@@ -147,14 +147,14 @@ public class PersistManager {
       Log.info("S3 subsystem not available");
     }
 
-    try {
-      Class klass = Class.forName("water.persist.PersistGcs");
-      java.lang.reflect.Constructor constructor = klass.getConstructor();
-      I[Value.GCS] = (Persist) constructor.newInstance();
-      Log.info("GCS subsystem successfully initialized");
-    } catch (Throwable ignore) {
+//    try {
+//      Class klass = Class.forName("water.persist.PersistGcs");
+//      java.lang.reflect.Constructor constructor = klass.getConstructor();
+//      I[Value.GCS] = (Persist) constructor.newInstance();
+//      Log.info("GCS subsystem successfully initialized");
+//    } catch (Throwable ignore) {
       Log.info("GCS subsystem not available");
-    }
+//    }
   }
 
   public void store(int backend, Value v) throws IOException {

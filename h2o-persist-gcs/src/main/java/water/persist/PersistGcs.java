@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class PersistGcs extends Persist {
 
-  private final Storage storage = StorageOptions.getDefaultInstance().getService();
+  private final Storage storage = null; //StorageOptions.getDefaultInstance().getService();
 
   @Override
   public byte[] load(final Value v) throws IOException {

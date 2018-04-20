@@ -88,7 +88,7 @@ public class Merge {
 
     // TODO: start merging before all indexes had been created. Use callback?
 
-    System.out.print("Making BinaryMerge RPC calls ... ");
+//    System.out.print("Making BinaryMerge RPC calls ... ");
     long t0 = System.nanoTime();
     ArrayList<BinaryMerge> bmList = new ArrayList<>();
     Futures fs = new Futures();
@@ -191,15 +191,15 @@ public class Merge {
         fs.add(new RPC<>(node, bm).call());
       }
     }
-    System.out.println("took: " + String.format("%.3f", (System.nanoTime() - t0) / 1e9));
+//    System.out.println("took: " + String.format("%.3f", (System.nanoTime() - t0) / 1e9));
 
     t0 = System.nanoTime();
-    System.out.println("Sending BinaryMerge async RPC calls in a queue ... ");
+//    System.out.println("Sending BinaryMerge async RPC calls in a queue ... ");
     fs.blockForPending();
-    System.out.println("took: " + (System.nanoTime() - t0) / 1e9);
+//    System.out.println("took: " + (System.nanoTime() - t0) / 1e9);
 
 
-    System.out.print("Removing DKV keys of left and right index.  ... ");
+//    System.out.print("Removing DKV keys of left and right index.  ... ");
     // TODO: In future we won't delete but rather persist them as index on the table
     // Explicitly deleting here (rather than Arno's cleanUp) to reveal if we're not removing keys early enough elsewhere
     t0 = System.nanoTime();
@@ -216,9 +216,9 @@ public class Merge {
         }
       }
     }
-    System.out.println("took: " + (System.nanoTime() - t0)/1e9);
+//    System.out.println("took: " + (System.nanoTime() - t0)/1e9);
 
-    System.out.print("Allocating and populating chunk info (e.g. size and batch number) ...");
+//    System.out.print("Allocating and populating chunk info (e.g. size and batch number) ...");
     t0 = System.nanoTime();
     long ansN = 0;
     int numChunks = 0;
@@ -243,11 +243,11 @@ public class Merge {
         k++;
       }
     }
-    System.out.println("took: " + (System.nanoTime() - t0) / 1e9);
+//    System.out.println("took: " + (System.nanoTime() - t0) / 1e9);
 
     // Now we can stitch together the final frame from the raw chunks that were
     // put into the store
-    System.out.print("Allocating and populated espc ...");
+//    System.out.print("Allocating and populated espc ...");
     t0 = System.nanoTime();
     long espc[] = new long[chunkSizes.length+1];
     int i=0;
@@ -257,10 +257,10 @@ public class Merge {
       sum+=s;
     }
     espc[espc.length-1] = sum;
-    System.out.println("took: " + (System.nanoTime() - t0) / 1e9);
+//    System.out.println("took: " + (System.nanoTime() - t0) / 1e9);
     assert(sum==ansN);
 
-    System.out.print("Allocating dummy vecs/chunks of the final frame ...");
+//    System.out.print("Allocating dummy vecs/chunks of the final frame ...");
     t0 = System.nanoTime();
     int numJoinCols = hasRite ? leftIndex._bytesUsed.length : 0;
     int numLeftCols = leftFrame.numCols();
@@ -280,26 +280,26 @@ public class Merge {
     }
     Key<Vec> key = Vec.newKey();
     Vec[] vecs = new Vec(key, Vec.ESPC.rowLayout(key, espc)).makeCons(numColsInResult, 0, doms, types);
-    System.out.println("took: " + (System.nanoTime() - t0) / 1e9);
+//    System.out.println("took: " + (System.nanoTime() - t0) / 1e9);
 
-    System.out.print("Finally stitch together by overwriting dummies ...");
+//    System.out.print("Finally stitch together by overwriting dummies ...");
     t0 = System.nanoTime();
     Frame fr = new Frame(names, vecs);
     ChunkStitcher ff = new ChunkStitcher(chunkSizes, chunkLeftMSB, chunkRightMSB, chunkBatch);
     ff.doAll(fr);
-    System.out.println("took: " + (System.nanoTime() - t0) / 1e9);
+//    System.out.println("took: " + (System.nanoTime() - t0) / 1e9);
 
     //Merge.cleanUp();
     return fr;
   }
 
   private static RadixOrder createIndex(boolean isLeft, Frame fr, int[] cols, int[][] id_maps, int[] ascending) {
-    System.out.println("\nCreating "+(isLeft ? "left" : "right")+" index ...");
+//    System.out.println("\nCreating "+(isLeft ? "left" : "right")+" index ...");
     long t0 = System.nanoTime();
     RadixOrder idxTask = new RadixOrder(fr, isLeft, cols, id_maps, ascending);
     H2O.submitTask(idxTask);    // each of those launches an MRTask
     idxTask.join(); 
-    System.out.println("***\n*** Creating "+(isLeft ? "left" : "right")+" index took: " + (System.nanoTime() - t0) / 1e9 + "\n***\n");
+//    System.out.println("***\n*** Creating "+(isLeft ? "left" : "right")+" index took: " + (System.nanoTime() - t0) / 1e9 + "\n***\n");
     return idxTask;
   }
 

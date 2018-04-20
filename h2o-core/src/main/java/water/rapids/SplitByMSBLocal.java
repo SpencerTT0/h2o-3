@@ -5,7 +5,6 @@ import water.fvec.Chunk;
 import water.util.ArrayUtils;
 import water.util.Log;
 import water.util.MathUtils;
-import water.util.PrettyPrint;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -63,7 +62,7 @@ class SplitByMSBLocal extends MRTask<SplitByMSBLocal> {
     }
     // shared between threads on the same node, all mappers write into distinct
     // locations (no conflicts, no need to atomic updates, etc.)
-    System.out.print("Allocating _o and _x buckets on this node with known size up front ... ");
+//    System.out.print("Allocating _o and _x buckets on this node with known size up front ... ");
     long t0 = System.nanoTime();
     _o = new long[256][][];
     _x = new byte[256][][];  // for each bucket, there might be > 2^31 bytes, so an extra dimension for that
@@ -83,7 +82,7 @@ class SplitByMSBLocal extends MRTask<SplitByMSBLocal> {
       _o[msb][b] = new long[lastSize];
       _x[msb][b] = new byte[lastSize * _keySize];
     }
-    System.out.println("done in " + (System.nanoTime() - t0) / 1e9);
+//    System.out.println("done in " + (System.nanoTime() - t0) / 1e9);
 
     // TO DO: otherwise, expand width. Once too wide (and interestingly large
     // width may not be a problem since small buckets won't impact cache),
@@ -112,7 +111,7 @@ class SplitByMSBLocal extends MRTask<SplitByMSBLocal> {
   @Override public void map(Chunk chk[]) {
     long myCounts[] = _counts[chk[0].cidx()]; //cumulative offsets into o and x
     if (myCounts == null) {
-      System.out.println("myCounts empty for chunk " + chk[0].cidx());
+//      System.out.println("myCounts empty for chunk " + chk[0].cidx());
       return;
     }
 
@@ -250,9 +249,9 @@ class SplitByMSBLocal extends MRTask<SplitByMSBLocal> {
     // TODO: send nChunks * 256.  Currently we do nNodes * 256.  Or avoid DKV
     // altogether if possible.
 
-    System.out.print("Starting SendSplitMSB on this node (keySize is " + _keySize + " as [");
-    for( int bs : _bytesUsed ) System.out.print(" "+bs);
-    System.out.println(" ]) ...");
+//    System.out.print("Starting SendSplitMSB on this node (keySize is " + _keySize + " as [");
+//    for( int bs : _bytesUsed ) System.out.print(" "+bs);
+//    System.out.println(" ]) ...");
 
     long t0 = System.nanoTime();
     Futures myfs = new Futures(); // Private Futures instead of _fs, so can block early and get timing results
@@ -266,9 +265,9 @@ class SplitByMSBLocal extends MRTask<SplitByMSBLocal> {
     myfs.blockForPending();
     double timeTaken = (System.nanoTime() - t0) / 1e9;
     long bytes = _numRowsOnThisNode*( 8/*_o*/ + _keySize) + 64;
-    System.out.println("took : " + timeTaken);
-    System.out.println("  DKV.put " + PrettyPrint.bytes(bytes) + " @ " +
-                       String.format("%.3f", bytes / timeTaken / (1024*1024*1024)) + " GByte/sec  [10Gbit = 1.25GByte/sec]");
+//    System.out.println("took : " + timeTaken);
+//    System.out.println("  DKV.put " + PrettyPrint.bytes(bytes) + " @ " +
+//                       String.format("%.3f", bytes / timeTaken / (1024*1024*1024)) + " GByte/sec  [10Gbit = 1.25GByte/sec]");
   }
 
   class SendOne extends H2O.H2OCountedCompleter<SendOne> {
